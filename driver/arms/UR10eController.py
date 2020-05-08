@@ -1,11 +1,10 @@
 # Copyright (c) 2019 by liuxiaobo. All Rights Reserved.
 # !/usr/bin/python
 # coding=utf-8
-import numpy as np
 import socket
 import struct
-import time
 import math
+import time
 import sys
 import os
 
@@ -18,145 +17,198 @@ from modules.calibration.Calibration3D import *
 
 
 class UR10eController(ArmController):
-    def __init__(self, configuration):
+    def __init__(self, configuration_path):
         super(UR10eController, self).__init__()
-        self._cfg = configuration
+        self._cfg = readConfiguration(configuration_path)
         self._robot_ip = self._cfg['SOCKET_CONFIGURATION']['robot_ip']
         self._port = self._cfg['SOCKET_CONFIGURATION']['port_number']
         self._home_pose = self._cfg['HOME_POSE']
         self._home_joints = self._cfg['HOME_JOINTS']
         self._pick_z = self._cfg['PICK_Z']
         self._place_z = self._cfg['PLACE_Z']
-        self._calibration_tool = ''
-        self._R = np.zeros((3, 3))
-        self._t = np.zeros((3, 1))
+        self._R = None
+        self._t = None
 
-    def goHome(self):
-        # print('homing...')
-        joint = [self._home_joints[0][0], self._home_joints[0][1], self._home_joints[0][2],
-                 self._home_joints[1][0], self._home_joints[1][1], self._home_joints[1][2]]
-        pose = [self._home_pose[0][0], self._home_pose[0][1], self._home_pose[0][2],
-                self._home_pose[1][0], self._home_pose[1][1], self._home_pose[1][2]]
-        self.move([joint, pose], useJoint=True)
-        # self.move([[-61.3, -103.53, -139.63], [-26.82, 90, 27.77]], useJoint=True)
+        # Default joint speed configuration
+        self.joint_acc = self._cfg['JOINT_ACC']
+        self.joint_vel = self._cfg['JOINT_VEL']
 
-    def execute(self, group, plan):
-        pass
+        # Joint tolerance in radian for blocking program
+        self.joint_tolerance = [0.01,0.01,0.01,0.01,0.01,0.01]
 
-    def multiple_points_move(self, command):
+        # Default tool speed configuration
+        self.tool_acc = 0.5 # Safe: 0.5
+        self.tool_vel = 0.2 # Safe: 0.2
+
+        # Tool pose tolerance for blocking program
+        self.tool_pose_tolerance = [0.001,0.001,0.001,0.01,0.01,0.01]
+
+        # self.load_calibration_matrix()
+
+    def go_home(self):
+        joint = [self._home_joints[0], self._home_joints[1], self._home_joints[2],
+                 self._home_joints[3], self._home_joints[4], self._home_joints[5]]
+        self.move_j(joint)
+
+    def move_j(self, joint, solution_space="Joint"):
+        """
+        parameter joint is in degree.
+        """
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(10)
         s.connect((self._robot_ip, self._port))
-        s.send(str.encode(command))
-        s.close()
 
-    def move(self, goal_pose, a=0.5, v=0.6,useJoint = False):
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(10)
-        s.connect((self._robot_ip, self._port))
-        # time.sleep(0.05)
-
-        goal_position = goal_pose[0]
-        goal_orientation = goal_pose[1]
-
-        if(useJoint==False):
-            # s.send ("movej(p[ %f, %f, %f, %f, %f, %f], a = %f, v = %f)\n" %(x/1000.0,y/1000.0,z/1000.0,Rx,Ry,Rz,a,v))
-            x, y, z = goal_position[0], goal_position[1], goal_position[2]
-            Rx, Ry, Rz = self.rpy2rotation(goal_orientation[0], goal_orientation[1], goal_orientation[2])
-            s.send ("movej(p[ %f, %f, %f, %f, %f, %f], a = %f, v = %f)\n" %(x,y,z,Rx,Ry,Rz,a,v))
-            self.verifyPosition([x, y, z, Rx, Ry, Rz])
+        if solution_space == "Joint":
+            # move_command = f"movej([{joint[0]},{joint[1]},{joint[2]},{joint[3]},{joint[4]},{joint[5]}],a={accelerate},v=v{velocity})\n"
+            move_command = "movej([{},{},{},{},{},{}],a={},v={})\n".format(joint[0] * 3.14159 / 180.0,
+                                                                           joint[1] * 3.14159 / 180.0,
+                                                                           joint[2] * 3.14159 / 180.0,
+                                                                           joint[3] * 3.14159 / 180.0,
+                                                                           joint[4] * 3.14159 / 180.0,
+                                                                           joint[5] * 3.14159 / 180.0,
+                                                                           self.joint_acc, self.joint_vel)
         else:
-            #radian of each joint
-            x, y, z = goal_position[0], goal_position[1], goal_position[2]
-            Rx, Ry, Rz = goal_position[3], goal_position[4], goal_position[5]
-            s.send ("movej([ %f, %f, %f, %f, %f, %f], a = %f, v = %f)\n" %(x*3.14159/180.0,y*3.14159/180.0,z*3.14159/180.0,Rx*3.14159/180.0,Ry*3.14159/180.0,Rz*3.14159/180.0,a,v))
-            hx, hy, hz = goal_orientation[0], goal_orientation[1], goal_orientation[2]
-            hRx, hRy, hRz = goal_orientation[3], goal_orientation[4], goal_orientation[5]
-            self.verifyJoints([hx, hy, hz, hRx, hRy, hRz])
-        time.sleep(0.2)
+            # move_command = f"movel([{joint[0]},{joint[1]},{joint[2]},{joint[3]},{joint[4]},{joint[5]}],a={accelerate},v=v{velocity})\n"
+            move_command = "movel([{},{},{},{},{},{}],a={},v={})\n".format(joint[0], joint[1], joint[2],
+                                                                           joint[3], joint[4], joint[5],
+                                                                           self.tool_acc, self.tool_vel)
+        # move_command = bytes(move_command, encoding='utf-8')
+        s.send(move_command)
         s.close()
+        self.verify_state("Joint", joint)
 
-    def openGripper(self):
+    def move_p(self, position, solution_space="Joint"):
+        """
+        parameter position is (x, y, x, roll, pitch, yaw) in meter and radian.
+        """
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(10)
         s.connect((self._robot_ip, self._port))
-        s.send(str.encode('set_digital_out(4,%s)\n' %True))
-        s.close()
+        Rx, Ry, Rz = self.rpy2rotation(position[3], position[4], position[5])
 
-    def closeGripper(self):
+        if solution_space == "Joint":
+            # move_command = f"movej([p{position[0]},{position[1]},{position[2]},{position[3]},{position[4]},{position[5]}],a={accelerate},v=v{velocity})\n"
+            move_command = "movej(p[{},{},{},{},{},{}],a={},v={})\n".format(position[0], position[1], position[2],
+                                                                            Rx, Ry, Rz,
+                                                                            self.joint_acc, self.joint_vel)
+        else:
+            # move_command = f"movel([p{position[0]},{position[1]},{position[2]},{position[3]},{position[4]},{position[5]}],a={accelerate},v=v{velocity})\n"
+            move_command = "movel(p[{},{},{},{},{},{}],a={},v={})\n".format(position[0], position[1], position[2],
+                                                                            Rx, Ry, Rz,
+                                                                            self.tool_acc, self.tool_vel)
+        # move_command = bytes(move_command, encoding='utf-8')
+        s.send(move_command)
+        s.close()
+        self.verify_state("Position", position[:3]+[Rx, Ry, Rz])
+
+    def set_io(self, port, value):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(10)
         s.connect((self._robot_ip, self._port))
-        s.send(str.encode('set_digital_out(4,%s)\n' %False))
+        # command = f"set_digital_out({port}, {value})\n"
+        # command = bytes(command, encoding='utf-8')
+        command = "set_digital_out({}, {})\n".format(port, value)
+        s.send(command)
         s.close()
 
-    def verifyJoints(self, targetPosition):
+    def get_state(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(10)
+        s.connect((self._robot_ip, self._port))
+        # command = f"get_state()\n"
+        # command = bytes(command, encoding='utf-8')
+        command = "get_state()\n"
+        s.send(command)
+
+        packet_1 = s.recv(252)
+        joint_1 = self.encode_information(s) / 3.14 * 180
+        joint_2 = self.encode_information(s) / 3.14 * 180
+        joint_3 = self.encode_information(s) / 3.14 * 180
+        joint_4 = self.encode_information(s) / 3.14 * 180
+        joint_5 = self.encode_information(s) / 3.14 * 180
+        joint_6 = self.encode_information(s) / 3.14 * 180
+
+        packet_2 = s.recv(144)
+        x = self.encode_information(s)
+        y = self.encode_information(s)
+        z = self.encode_information(s)
+        Rx = self.encode_information(s)
+        Ry = self.encode_information(s)
+        Rz = self.encode_information(s)
+
+        return {"Position": [x, y, z, Rx, Ry, Rz], "Joint": [joint_1, joint_2, joint_3, joint_4, joint_5, joint_6]}
+
+    def verify_state(self, variable_name, target_value, FT = False):
         delay_time = True
         cnt = 0
-        timeGap = 1
-        while(delay_time and cnt < 100):
-            currentPose = self.get_pos()
-            # print(targetPosition)
-            # print(currentPose)
-            dpose = np.zeros(3)
-            inv_dpose = np.zeros(3)
-            dpose[0] = abs(currentPose[0]-targetPosition[0])
-            dpose[1] = abs(currentPose[1]-targetPosition[1])
-            dpose[2] = abs(currentPose[2]-targetPosition[2])
-            # dpose[3] = abs(currentPose[3]-targetPosition[3])
-            # dpose[4] = abs(currentPose[4]-targetPosition[4])
-            # dpose[5] = abs(currentPose[5]-targetPosition[5])
+        timeGap = 0.01
 
-            inv_dpose[0] = abs(currentPose[0]-targetPosition[0])
-            inv_dpose[1] = abs(currentPose[1]-targetPosition[1])
-            inv_dpose[2] = abs(currentPose[2]-targetPosition[2])
-            # inv_dpose[3] = abs(-currentPose[3]-targetPosition[3])
-            # inv_dpose[4] = abs(-currentPose[4]-targetPosition[4])
-            # inv_dpose[5] = abs(-currentPose[5]-targetPosition[5])
-
-            if (max(dpose) < 0.02 or max(inv_dpose) < 0.02):
-                delay_time = False
-                return True
-            else:
+        if variable_name == "Joint":
+            error = self.joint_tolerance
+            while(delay_time and cnt < 1000):
+                currentStatus = self.get_state()
+                currentPose = currentStatus[variable_name]
+                if currentPose is None:
+                    print("Getting current value failed, please check variable name.")
+                    return False
+                dpose = abs(np.array(currentPose) - np.array(target_value))/180*3.1415
+                if(FT == True):
+                    # import ft mudules
+                    from driver.sensors.FT.getFT_Data import detectCollision
+                    collosion_bool = detectCollision()
+                    if collosion_bool==True:
+                        return False
+                    else:
+                        pass
+                if (all( [dpose[j] < error[j] for j in range(6)] )):
+                    delay_time = False
+                    return True
                 time.sleep(timeGap)
                 cnt = cnt + 1
-            if(cnt*timeGap >= 20):
-                print("Time Out!")
-                return False
-
-    def verifyPosition(self, targetPosition):
-        delay_time = True
-        cnt = 0
-        timeGap = 1
-        while(delay_time and cnt < 100):
-            currentPose = self.get_pos()
-            # print(targetPosition)
-            # print(currentPose)
-            dpose = np.zeros(6)
-            inv_dpose = np.zeros(6)
-            dpose[0] = abs(currentPose[0]-targetPosition[0])
-            dpose[1] = abs(currentPose[1]-targetPosition[1])
-            dpose[2] = abs(currentPose[2]-targetPosition[2])
-            dpose[3] = abs(currentPose[3]-targetPosition[3])
-            dpose[4] = abs(currentPose[4]-targetPosition[4])
-            dpose[5] = abs(currentPose[5]-targetPosition[5])
-
-            inv_dpose[0] = abs(currentPose[0]-targetPosition[0])
-            inv_dpose[1] = abs(currentPose[1]-targetPosition[1])
-            inv_dpose[2] = abs(currentPose[2]-targetPosition[2])
-            inv_dpose[3] = abs(-currentPose[3]-targetPosition[3])
-            inv_dpose[4] = abs(-currentPose[4]-targetPosition[4])
-            inv_dpose[5] = abs(-currentPose[5]-targetPosition[5])
-
-            if (max(dpose) < 0.02 or max(inv_dpose) < 0.02):
-                delay_time = False
-                return True
-            else:
+            print("Time Out 10 seconds!")
+            return False
+        else:
+            error = self.tool_pose_tolerance
+            while(delay_time and cnt < 1000):
+                currentStatus = self.get_state()
+                currentPose = currentStatus[variable_name]
+                if currentPose is None:
+                    print("Getting current value failed, please check variable name.")
+                    return False
+                dpose = abs(np.array(currentPose) - np.array(target_value))
+                for a in [3,4,5]:
+                    if dpose[a]>6:
+                        dpose[a] = dpose[a] - 2* 3.141592653589793
+                    if dpose[3]<-6:
+                        dpose[a] = dpose[a] + 2* 3.141592653589793
+                if(FT == True):
+                    # import ft mudules
+                    from driver.sensors.FT.getFT_Data import detectCollision
+                    collosion_bool = detectCollision()
+                    if collosion_bool==True:
+                        return False
+                    else:
+                        pass
+                if (all( [dpose[j] < error[j] for j in range(6)] )):
+                    delay_time = False
+                    return True
                 time.sleep(timeGap)
                 cnt = cnt + 1
-            if(cnt*timeGap >= 20):
-                print("Time Out!")
-                return False
+            print("Time Out 10 seconds!")
+            return False
+
+
+    def encode_information(self, s, length=8):
+        packet = s.recv(length)
+        packet = packet.encode("hex")
+        information = struct.unpack('!d', packet.decode('hex'))[0]
+        return information
+
+    def load_calibration_matrix(self):
+        d = np.load(os.path.dirname(_root_path)+self._cfg["CALIBRATION_DIR"])
+        observed_pts = d['arr_0']
+        measured_pts = d['arr_1']
+        self._R, self._t = self.get_rigid_transform(observed_pts, measured_pts)
 
     def get_rigid_transform(self, A, B):
         assert len(A) == len(B)
@@ -174,61 +226,28 @@ class UR10eController(ArmController):
         t = np.dot(-R, centroid_A.T) + centroid_B.T
         return R, t
 
-    def calibrating(self, camera):
-        initial_pose = self.cfg['initial_pose']
-        x_step = self.cfg['x_step_length']
-        y_step = self.cfg['y_step_length']
-        z_step = self.cfg['z_step_length']
-
-        self.move(initial_pose)
-        x = initial_pose[0][0]
-        y = initial_pose[0][1]
-        z = initial_pose[0][2]
-
-        observed_pts = []
-        measured_pts = []
-        for i in range(4):
-            for j in range(4):
-                for k in range(4):
-                    self.move([[x + x_step * i, y + y_step * j, z + z_step * k], initial_pose[1]])
-                    color_image, info = camera.getImage()
-                    depth_image = info[0]
-                    observed_pt = image_callback(color_image, depth_image, camera.get_depth_scale())
-                    measured_pt = [x + x_step * i, y + y_step * j, z + z_step * k + 0.17]
-                    if len(observed_pt)!=0:
-                        observed_pts.append(observed_pt)
-                        measured_pts.append(measured_pt)
-        np.savez(os.path.dirname(_root_path)+"/data/calibration_data.npz", observed_pts, measured_pts)
-
-    def matrix_load(self):
-        d = np.load(os.path.dirname(_root_path)+"/data/calibration_data.npz")
-        observed_pts = d['arr_0']
-        measured_pts = d['arr_1']
-        self._R, self._t = self.get_rigid_transform(observed_pts, measured_pts)
-
-    def uvd2xyz(self, u, v, depth_image, depth_scale):
-        camera_z = np.mean(np.mean(depth_image[v - 5:v + 5, u - 5:u + 5])) * depth_scale
-        camera_x = np.multiply(u - 642.142, camera_z / 922.378)
-        camera_y = np.multiply(v - 355.044, camera_z / 922.881)
-        # camera_x = np.multiply(u - 963.212, camera_z / 1383.57)
-        # camera_y = np.multiply(v - 532.567, camera_z / 1384.32)
+    def uvd2xyz(self, u, v, depth_image, intrinsics):
+        fx = intrinsics[0]
+        fy = intrinsics[1]
+        cx = intrinsics[2]
+        cy = intrinsics[3]
+        camera_z = np.mean(np.mean(depth_image[v - 5:v + 5, u - 5:u + 5])) / 1000.0
+        camera_x = np.multiply(u - cx, camera_z / fx)
+        camera_y = np.multiply(v - cy, camera_z / fy)
 
         view = depth_image[v - 30:v + 30, u - 30:u + 30]
         view[view == 0] = 10000
         avoid_z = np.min(view)
-        # print(camera_z, avoid_z * depth_scale)
+
         avoid_v = np.where(depth_image[v - 30:v + 30, u - 30:u + 30] == avoid_z)[0][0] + v - 5
         avoid_u = np.where(depth_image[v - 30:v + 30, u - 30:u + 30] == avoid_z)[1][0] + u - 5
-        avoid_x = np.multiply(avoid_u - 642.142, avoid_z * depth_scale / 922.378) # 1280, 720
-        avoid_y = np.multiply(avoid_v - 355.044, avoid_z * depth_scale / 922.881) # 1280, 720
-        # avoid_x = np.multiply(avoid_u - 963.212, avoid_z * depth_scale / 1383.57) # 1920, 1080
-        # avoid_y = np.multiply(avoid_v - 532.567, avoid_z * depth_scale / 1384.32) # 1920, 1080
+        avoid_z = avoid_z / 1000.0
+        avoid_x = np.multiply(avoid_u - cx, avoid_z / fx)
+        avoid_y = np.multiply(avoid_v - cy, avoid_z / fy)
 
         xyz = self._R.dot(np.array([camera_x, camera_y, camera_z]).T) + self._t.T
-        avoid_xyz = self._R.dot(np.array([avoid_x, avoid_y, avoid_z * depth_scale]).T) + self._t.T
+        avoid_xyz = self._R.dot(np.array([avoid_x, avoid_y, avoid_z]).T) + self._t.T
         return list(xyz.T), avoid_xyz[2]
-
-
 
     def rpy2rotation(self, roll, pitch, yaw):
         yawMatrix = np.matrix([
@@ -260,73 +279,3 @@ class UR10eController(ArmController):
         rotation[1] = ry
         rotation[2] = rz
         return rotation
-
-    def get_pos(self):
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(10)
-            s.connect((self._robot_ip, self._port))
-            s.send("get_state()"+"\n")
-            time.sleep(0.1)
-            packet_1 = s.recv(444)
-
-            packet_12 = s.recv(8)
-            packet_12 = packet_12.encode("hex") #convert the data from \x hex notation to plain hex
-            x = str(packet_12)
-            x = struct.unpack('!d', packet_12.decode('hex'))[0]
-            # print("X = ", x * 1000)
-
-            packet_13 = s.recv(8)
-            packet_13 = packet_13.encode("hex") #convert the data from \x hex notation to plain hex
-            y = str(packet_13)
-            y = struct.unpack('!d', packet_13.decode('hex'))[0]
-            # print("Y = ", y * 1000)
-
-            packet_14 = s.recv(8)
-            packet_14 = packet_14.encode("hex") #convert the data from \x hex notation to plain hex
-            z = str(packet_14)
-            z = struct.unpack('!d', packet_14.decode('hex'))[0]
-            # print("Z = ", z * 1000)
-
-            packet_15 = s.recv(8)
-            packet_15 = packet_15.encode("hex") #convert the data from \x hex notation to plain hex
-            Rx = str(packet_15)
-            Rx = struct.unpack('!d', packet_15.decode('hex'))[0]
-            # print "Rx = ", Rx
-
-            packet_16 = s.recv(8)
-            packet_16 = packet_16.encode("hex") #convert the data from \x hex notation to plain hex
-            Ry = str(packet_16)
-            Ry = struct.unpack('!d', packet_16.decode('hex'))[0]
-            # print "Ry = ", Ry
-
-            packet_17 = s.recv(8)
-            packet_17 = packet_17.encode("hex") #convert the data from \x hex notation to plain hex
-            Rz = str(packet_17)
-            Rz = struct.unpack('!d', packet_17.decode('hex'))[0]
-            # print "Rz = ", Rz
-            beta = (1-2*3.14/math.sqrt(Rx*Rx+Ry*Ry+Rz*Rz))
-            Rx = Rx * beta
-            Ry = Ry * beta
-            Rz = Rz * beta
-            pose = np.zeros(6)
-            # pose[0] = x*1000.0
-            # pose[1] = y*1000.0
-            # pose[2] = z*1000.0
-            pose[0] = x
-            pose[1] = y
-            pose[2] = z
-            pose[3] = Rx
-            pose[4] = Ry
-            pose[5] = Rz
-            return pose
-            # print("Rx = ", Rx)
-            # print("Ry = ", Ry)
-            # print("Rz = ", Rz)
-            s.close()
-        except socket.error as socketerror:
-            print("Error: ", socketerror)
-    #
-    # def get_pos(self):
-    #     pose = self.urmonitor.tcf_pose()
-    #     return pose

@@ -4,25 +4,24 @@ SOCKET_CONFIGURATION:
   port_number: 30003
 
 HOME_JOINTS:
-  -
-    - -72.94
-    - -80.84
-    - -130.1
-  -
-    - -51.87
-    - 111.72
-    - -161.44
+  - -72.58
+  - -74.45
+  - -94.91
+  - -100.72
+  - 89.25
+  - 107.34
 
 HOME_POSE:
-  -
-    - 0.03
-    - -0.54
-    - 0.4
-  -
-    - 3.14
-    - -0.4
-    - 0
-PICK_Z: 0.
-PLACE_Z: 0.08
-CALIBRATION_DIR: "/data/calibration_data/ur5.npz"
+  - 0.012
+  - -0.3085
+  - 0.46689
+  - 3.14
+  - 0
+  - 0
 
+JOINT_ACC: 1.6
+JOINT_VEL: 0.7
+
+PICK_Z: 0.34
+PLACE_Z: 0.40
+CALIBRATION_DIR: "/data/calibration_data/ur5-realsense.npz"

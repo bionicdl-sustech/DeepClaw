@@ -9,11 +9,11 @@ class HandEController:
     __closePath = __currentPath + '/' + 'gripper_close.script'
     __openPath = __currentPath + '/' + 'gripper_open.script'
     __activePath = __currentPath + '/' + 'gripper_active.script'
-    def __init__(self,robot_ip = "192.168.31.10",port = 30003):
+    def __init__(self,robot_ip = "192.168.1.10",port = 30003):
         self.__robot_ip = robot_ip
         self.__port = port
 
-    def closeGripper(self):
+    def close_gripper(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((self.__robot_ip, self.__port))
         with open(self.__closePath, "rb") as f:
@@ -23,7 +23,7 @@ class HandEController:
                 l = f.read(1024)
         s.close()
 
-    def openGripper(self):
+    def open_gripper(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((self.__robot_ip, self.__port))
         with open(self.__openPath, "rb") as f:
@@ -33,7 +33,7 @@ class HandEController:
                 l = f.read(1024)
         s.close()
 
-    def activeGripper(self):
+    def active_gripper(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((self.__robot_ip, self.__port))
         with open(self.__activePath, "rb") as f:
@@ -57,11 +57,11 @@ class HandEController:
         s.close()
 
 if __name__ == '__main__':
-    ip = "192.168.31.10"
+    ip = "192.168.1.10"
     port = 30003
     gripper_controller = HandEController(ip,port)
-    gripper_controller.activeGripper()
-    time.sleep(2)
-    gripper_controller.closeGripper()
+    # gripper_controller.active_gripper()
     # time.sleep(2)
-    # gripper_controller.openGripper()
+    gripper_controller.close_gripper()
+    time.sleep(2)
+    gripper_controller.open_gripper()
