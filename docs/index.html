@@ -117,10 +117,10 @@
               
                 <p><img alt="DeepClaw-Logo" src="asset/fig-DeepClaw.png" /></p>
 <h1 id="the-deepclaw-benchmark">The DeepClaw Benchmark<a class="headerlink" href="#the-deepclaw-benchmark" title="Permanent link">&para;</a></h1>
-<p>The DeepClaw is a benchmarking model zoo that functions as a Reconfigurable Robotic Manipulation System for Robot Learning. The main homepage can be found at <a href="https://bionicdl-sustech.github.io/DeepClawBenchmark/">here</a>. This is the GitHub repository of DeepClaw source code, including instructions for installing and using DeepClaw.</p>
+<p>The DeepClaw is a benchmarking model zoo that functions as a Reconfigurable Robotic Manipulation System for Robot Learning. The main homepage can be found at <a href="https://bionicdl-sustech.github.io/DeepClaw/">here</a>. This is the GitHub repository of DeepClaw source code, including instructions for installing and using DeepClaw.</p>
 <h2 id="resources">Resources<a class="headerlink" href="#resources" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Documentation: <a href="https://bionicdl-sustech.github.io/DeepClawBenchmark/">https://bionicdl-sustech.github.io/DeepClawBenchmark/</a></li>
+<li>Documentation: <a href="https://bionicdl-sustech.github.io/DeepClaw/">https://bionicdl-sustech.github.io/DeepClaw/</a></li>
 <li>Paper explaining DeepClaw: <a href="https://arxiv.org/abs/2005.02588">arXiv:2005.02588 [cs.RO]</a></li>
 <li>Papers using DeepClaw: <ul>
 <li><a href="https://arxiv.org/abs/2003.01584">arXiv:2003.01584 [cs.RO]</a></li>
@@ -132,13 +132,12 @@
 <h2 id="code-organization">Code Organization<a class="headerlink" href="#code-organization" title="Permanent link">&para;</a></h2>
 <p>The DeepClaw code is organized as follows:</p>
 <div class="codehilite"><pre><span></span><code>configs/                    configuration for robotic station for manipulation tasks.
+data/                       Common dataset
 deepclaw/drivers/           drivers for various robotic hardware, i.e. ur, franka, aubo.
 deepclaw/models/            model zoo for segmentation, classification, pick planning, and motion planning.
 deepclaw/utils/             server setup with dockers and client setup for laptops (x86) and jetson (arm).
 projects/proj_TrashSorting  a sample project to run deepclaw for sorting trash.
-datasets/trash              description of trash sorting dataset
 docs/                       description of this document as a manual.
-data/trash                  data on trash sorting
 </code></pre></div>
 
 
@@ -196,5 +195,5 @@ data/trash                  data on trash sorting
 
 <!--
 MkDocs version : 1.1
-Build Date UTC : 2020-05-08 10:27:59
+Build Date UTC : 2020-05-08 10:32:47
 -->
