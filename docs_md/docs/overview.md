@@ -64,8 +64,8 @@ In DeepClaw 2.0, we propose a new structure: the Server-Client Structure. This s
 
 More details can be found here.
 
-- [how to add a new module in server]([https://github.com/bionicdl-sustech/DeepClaw/blob/master/deepclaw/utils/Add%20New%20Module%20in%20Server.md])
-- [how to create a related module in client]([https://github.com/bionicdl-sustech/DeepClaw/blob/master/deepclaw/utils/Create%20A%20New%20Client%20Module.md])
+- [how to add a new module in server](https://github.com/bionicdl-sustech/DeepClaw/blob/master/deepclaw/utils/Add%20New%20Module%20in%20Server.md)
+- [how to create a related module in client](https://github.com/bionicdl-sustech/DeepClaw/blob/master/deepclaw/utils/Create%20A%20New%20Client%20Module.md)
 
 ## Publication
 
