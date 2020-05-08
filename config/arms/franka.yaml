@@ -1,9 +1,0 @@
-# initial params
-robot_ip: "192.168.1.100"
-
-HOME_JOINTS:
-  -
-HOME_POSE:
-  - 
-CALIBRATION_DIR: "/data/calibration_data/franka-realsense.npz"
-
