@@ -29,7 +29,7 @@ setup(
         'numpy==1.18.2',
         'matplotlib==3.2.1',
         'opencv_contrib_python==4.1.2.30',
-        'PyYAML==5.3.1',
+        'PyYAML',
         'pyrealsense2==2.34.0.1470',
         'scipy==1.4.1',
         'tqdm==4.46.0'

@@ -1,0 +1,6 @@
+
+*.pyc
+.idea
+.ipynb_checkpoints
+*.pdf
+*.mp4

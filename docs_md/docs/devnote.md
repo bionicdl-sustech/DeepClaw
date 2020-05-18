@@ -13,7 +13,7 @@ This documentation is edited using [MkDocs](https://www.mkdocs.org/). For full d
 
 Because the documentation will include some navigation headers, you may need to edit the configuration file first.
 
-The `websrc/mkdocs.yaml` configuration file looks like:
+The `docs_md/mkdocs.yaml` configuration file looks like:
 
 ```yaml
 site_name: DeepClaw
@@ -31,7 +31,7 @@ nav:
 theme: readthedocs
 ```
 
-You can add a new markdown file into docs, like `websrc/docs/<NEW_FILE_NAME>.md`. Then edit this configuration file, insert the markdown file into the `nav` , for example:
+You can add a new markdown file into docs, like `docs_md/docs/<NEW_FILE_NAME>.md`. Then edit this configuration file, insert the markdown file into the `nav` , for example:
 
 ```yaml
 ...

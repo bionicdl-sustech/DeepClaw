@@ -4,19 +4,29 @@ The DeepClaw cell, shown on the bottom of the following figure, is a self-contai
 
 ![](asset/fig-DeepClaw-SupportedHardware.png)
 
+The supported hardware are listed below
+| Arm (Manipulator)       | Hand (Gripper) | Eye (Camera)             | Accessory (Sensor) |
+|-------------------------|----------------|--------------------------|--------------------|
+| Universal Robots: UR10e | Robotiq: HandE | Intel: Realsense D435   *|                    |
+| Universal Robots: UR5   | OnRobot: RG6   | Microsoft: Kinect Azure *|                    |
+| Franka Emika: Panda    *|                |                          |                    |
+
+**Note**: `The drivers with (*) mark require extra installation steps in addition to the installation of deepclaw. Please go to the correspongding folders and follow the detailed instruction there`.
+
 ## Arm (Manipulator)
 
 ### Universal Robots: UR10e
 
-### Universal Robots: UR5 (TODO)
+### Universal Robots: UR5
 
-### Franka Emika: Panda (TODO)
+### Franka Emika: Panda
 
 ### AUBO: i5 (TODO)
 
 ### Denso: Cobotta (TODO)
 
 ### Yaskawa: MotoMini (TODO)
+
 
 ## Hand (Gripper)
 
@@ -26,23 +36,26 @@ The DeepClaw cell, shown on the bottom of the following figure, is a self-contai
 
 ### Customized: Suction (TODO)
 
+
 ## Eye (Camera)
 
 ### Intel: Realsense D435
 
 ### Intel: Realsense D435i (TODO)
 
-### Microsoft: Kinect Azure (TODO)
+### Microsoft: Kinect Azure
 
 ### Microsoft: Kinect V2 (TODO)
 
 ### Photoneo: Model M (TODO)
+
 
 ## Accessory (Sensor)
 
 ### OnRobot: Force-Torque Sensors (TODO)
 
 ### ATI: nano17 (TODO)
+
 
 ## DeepClaw Stations with UR10e (TODO)
 

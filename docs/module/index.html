@@ -72,6 +72,10 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#object-detection">Object Detection</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#grasp-planning">Grasp Planning</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#motion-planning">Motion Planning</a>
+    </li>
         </ul>
     </li>
     </ul>
@@ -137,8 +141,8 @@
 <p>DeepClaw maintains a module pool of algorithms and end-to-end robot learning models by integrating some state-of-the-art research results in computer vision and robotics. The codes are placed under deepclaw/modules/.</p>
 <h2 id="computation-on-server">Computation on server<a class="headerlink" href="#computation-on-server" title="Permanent link">&para;</a></h2>
 <p>As the running environment for each method is different, DeepClaw adopts concepts from cloud robotics. We put the running environments for end-to-end methods which requires heavy computations in a docker container on the server, and deploy the robot control and basic computations on a user computer.</p>
-<p>Currently we have two servers: Goldenboy and Serbreeze. Currently they are running Ubuntu16.04 and cuda9.0. We plan to upgrade them to Ubuntu18.04 and cuda10 soon.</p>
-<p>Each user is assigned to have one GPU card by setting environment varible CUDA_VISIBLE_DEVICES. Please don't change it by yourself. If you need more computation resources, please contact us.</p>
+<p>If you want to add a new module running on server and runing the inferene from a client computer, please refer to the tutorial <a href="../../deepclaw/utils/Add_New_Module_in_Server.md">server</a> and <a href="../../deepclaw/utils/Create_A_New_Client_Module.md">client</a>.</p>
+<p>Currently we have two servers: Goldenboy and Serbreeze. Currently they are running Ubuntu16.04 and cuda9.0. We plan to upgrade them to Ubuntu18.04 and cuda10 soon. Each user is assigned to have one GPU card by setting environment varible CUDA_VISIBLE_DEVICES. Please don't change it by yourself. If you need more computation resources, please contact us.</p>
 <table>
 <thead>
 <tr>
@@ -181,6 +185,9 @@
 </tbody>
 </table>
 <h2 id="list-of-modules">List of modules<a class="headerlink" href="#list-of-modules" title="Permanent link">&para;</a></h2>
+<p>We list all the algorithms and model available in DeepClaw. The code can be found under deepclaw/modules/ and demos are included under algorithm folders. Please check the following notes before running the demos:
+- In addition to the requirement of deepclaw, you might need to install extra dependencies for each module. Please refer to the readme.md under each module for more instructions.
+- You might need to download checkpoint of weight to run the demo. Please refer to the list below for downloading pretrained weights.</p>
 <h3 id="segmentation">Segmentation<a class="headerlink" href="#segmentation" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -199,6 +206,22 @@
 </tbody>
 </table>
 <h3 id="recognition">Recognition<a class="headerlink" href="#recognition" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Object classes</th>
+<th>weights</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Efficientnet</td>
+<td>4 recyclable waste</td>
+<td><a href="https://pan.baidu.com/s/1M7VXLzkBrFIbmgz9J8ic7g">link</a> extract code: ph2e</td>
+</tr>
+</tbody>
+</table>
 <h3 id="object-detection">Object Detection<a class="headerlink" href="#object-detection" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -213,6 +236,45 @@
 <td>Efficientdet</td>
 <td>204 waste classes</td>
 <td><a href="https://pan.baidu.com/s/1GiQSp-fWK_711mn13MPXow">link</a> extract code: frra</td>
+</tr>
+</tbody>
+</table>
+<h3 id="grasp-planning">Grasp Planning<a class="headerlink" href="#grasp-planning" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>output</th>
+<th>weights</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GraspNet</td>
+<td>9 rotation angles</td>
+<td><a href="https://pan.baidu.com/s/1SDoOEURdh3VJgk5DLRDyrQ">link</a> extract code: 7hy5</td>
+</tr>
+<tr>
+<td>DexNet</td>
+<td>gras pose with robustness</td>
+<td>refer to the <a href="../../deepclaw/modules/grasp_planning/Dex-Net/ReadMe.md">readme</a></td>
+</tr>
+</tbody>
+</table>
+<h3 id="motion-planning">Motion Planning<a class="headerlink" href="#motion-planning" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>output</th>
+<th>weights</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Predefined waypoints</td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>

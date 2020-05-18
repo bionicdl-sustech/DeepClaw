@@ -64,9 +64,9 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#universal-robots-ur10e">Universal Robots: UR10e</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#universal-robots-ur5-todo">Universal Robots: UR5 (TODO)</a>
+    <li class="toctree-l3"><a class="reference internal" href="#universal-robots-ur5">Universal Robots: UR5</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#franka-emika-panda-todo">Franka Emika: Panda (TODO)</a>
+    <li class="toctree-l3"><a class="reference internal" href="#franka-emika-panda">Franka Emika: Panda</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#aubo-i5-todo">AUBO: i5 (TODO)</a>
     </li>
@@ -92,7 +92,7 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#intel-realsense-d435i-todo">Intel: Realsense D435i (TODO)</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#microsoft-kinect-azure-todo">Microsoft: Kinect Azure (TODO)</a>
+    <li class="toctree-l3"><a class="reference internal" href="#microsoft-kinect-azure">Microsoft: Kinect Azure</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#microsoft-kinect-v2-todo">Microsoft: Kinect V2 (TODO)</a>
     </li>
@@ -212,10 +212,17 @@
                 <h1 id="robot-library">Robot Library<a class="headerlink" href="#robot-library" title="Permanent link">&para;</a></h1>
 <p>The DeepClaw cell, shown on the bottom of the following figure, is a self-contained robot cell for manipulation tasks, including an assembled station, a robot arm, a robot end-effector, a visual sensor. Thanks to the standardized design, we are able to buy the components and assemble the robot station quickly. The hardware setup is defined in the software part of DeepClaw through configuration files. The same task should be easily reproduced on different hardware setups if the configuration file is adequately defined. </p>
 <p><img alt="" src="../asset/fig-DeepClaw-SupportedHardware.png" /></p>
+<p>The supported hardware are listed below
+| Arm (Manipulator)       | Hand (Gripper) | Eye (Camera)             | Accessory (Sensor) |
+|-------------------------|----------------|--------------------------|--------------------|
+| Universal Robots: UR10e | Robotiq: HandE | Intel: Realsense D435   *|                    |
+| Universal Robots: UR5   | OnRobot: RG6   | Microsoft: Kinect Azure *|                    |
+| Franka Emika: Panda    *|                |                          |                    |</p>
+<p><strong>Note</strong>: <code>The drivers with (*) mark require extra installation steps in addition to the installation of deepclaw. Please go to the correspongding folders and follow the detailed instruction there</code>.</p>
 <h2 id="arm-manipulator">Arm (Manipulator)<a class="headerlink" href="#arm-manipulator" title="Permanent link">&para;</a></h2>
 <h3 id="universal-robots-ur10e">Universal Robots: UR10e<a class="headerlink" href="#universal-robots-ur10e" title="Permanent link">&para;</a></h3>
-<h3 id="universal-robots-ur5-todo">Universal Robots: UR5 (TODO)<a class="headerlink" href="#universal-robots-ur5-todo" title="Permanent link">&para;</a></h3>
-<h3 id="franka-emika-panda-todo">Franka Emika: Panda (TODO)<a class="headerlink" href="#franka-emika-panda-todo" title="Permanent link">&para;</a></h3>
+<h3 id="universal-robots-ur5">Universal Robots: UR5<a class="headerlink" href="#universal-robots-ur5" title="Permanent link">&para;</a></h3>
+<h3 id="franka-emika-panda">Franka Emika: Panda<a class="headerlink" href="#franka-emika-panda" title="Permanent link">&para;</a></h3>
 <h3 id="aubo-i5-todo">AUBO: i5 (TODO)<a class="headerlink" href="#aubo-i5-todo" title="Permanent link">&para;</a></h3>
 <h3 id="denso-cobotta-todo">Denso: Cobotta (TODO)<a class="headerlink" href="#denso-cobotta-todo" title="Permanent link">&para;</a></h3>
 <h3 id="yaskawa-motomini-todo">Yaskawa: MotoMini (TODO)<a class="headerlink" href="#yaskawa-motomini-todo" title="Permanent link">&para;</a></h3>
@@ -226,7 +233,7 @@
 <h2 id="eye-camera">Eye (Camera)<a class="headerlink" href="#eye-camera" title="Permanent link">&para;</a></h2>
 <h3 id="intel-realsense-d435">Intel: Realsense D435<a class="headerlink" href="#intel-realsense-d435" title="Permanent link">&para;</a></h3>
 <h3 id="intel-realsense-d435i-todo">Intel: Realsense D435i (TODO)<a class="headerlink" href="#intel-realsense-d435i-todo" title="Permanent link">&para;</a></h3>
-<h3 id="microsoft-kinect-azure-todo">Microsoft: Kinect Azure (TODO)<a class="headerlink" href="#microsoft-kinect-azure-todo" title="Permanent link">&para;</a></h3>
+<h3 id="microsoft-kinect-azure">Microsoft: Kinect Azure<a class="headerlink" href="#microsoft-kinect-azure" title="Permanent link">&para;</a></h3>
 <h3 id="microsoft-kinect-v2-todo">Microsoft: Kinect V2 (TODO)<a class="headerlink" href="#microsoft-kinect-v2-todo" title="Permanent link">&para;</a></h3>
 <h3 id="photoneo-model-m-todo">Photoneo: Model M (TODO)<a class="headerlink" href="#photoneo-model-m-todo" title="Permanent link">&para;</a></h3>
 <h2 id="accessory-sensor">Accessory (Sensor)<a class="headerlink" href="#accessory-sensor" title="Permanent link">&para;</a></h2>
