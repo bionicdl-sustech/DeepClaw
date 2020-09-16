@@ -1,6 +1,6 @@
 # Data Collection Platform
 
-![DeepClawLogo](asset/fig-DeepClaw.png)
+![DeepClawLogo](https://github.com/bionicdl-sustech/DeepClaw/blob/master/docs_md/docs/asset/fig-DeepClaw.png)
 
 ## Design Notes
 This data collection platform design include two parts: the physical assembling, and the software installation. In hardware part, we'll introduce how to assemble as the same as the robot system introduced by the paper[]. As for software, we'll provide the instruments how to collect your own data step by step.
@@ -16,5 +16,5 @@ To verify the installation:
 
     $ python dcp/demo.py
 If you can see data collection platform GUI is rendered on the screen as following, then your installation is successful.
-![DCP-GUI](asset/fig-GUI.png)
+![DCP-GUI](https://github.com/bionicdl-sustech/DeepClaw/blob/master/docs_md/docs/asset/fig-DeepClaw2GUI.png)
 
