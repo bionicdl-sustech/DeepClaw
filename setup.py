@@ -26,7 +26,7 @@ setup(
         'Topic :: Software Development :: Libraries'
     ],
     install_requires=[
-        'numpy==1.18.2',
+        'numpy==1.22.0',
         'matplotlib==3.2.1',
         'opencv_contrib_python==4.1.2.30',
         'PyYAML',
